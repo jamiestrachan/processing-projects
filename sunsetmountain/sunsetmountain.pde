@@ -8,15 +8,22 @@
 void setup() {
   size(400, 400);
   noFill();
+  noLoop();
   smooth();
   background(0);
 }
 
+float vary(int mid, int range) {
+  return random(mid-range, mid+range);
+  //return(mid + (randomGaussian() * range));
+}
+
 void draw() {
+  int startY = height-10;
+  stroke(255);
   beginShape();
-  vertex(0,  0);
-  vertex(100,  100);
-  vertex(200,  0);
-  vertex(400,  400);
+  for (int x = 0; x <= width; x+=10) {
+    vertex(x, vary(startY, 2));
+  }
   endShape();
 }
