@@ -1,4 +1,4 @@
-
+// based on code from https://forum.processing.org/two/discussion/17249/smooth-curves-from-series-of-x-y-co-ordinates.html
 int num = 15;
 PVector[] points = new PVector[num];
 
