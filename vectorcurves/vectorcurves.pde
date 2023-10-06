@@ -6,7 +6,7 @@ void setup() {
   size(300, 300);
   background(240, 140, 160);
 
-  for (var i = 0; i < num; i++) {
+  for (int i = 0; i < num; i++) {
     points[i] = new PVector (random(width), random(height));
   }
 }
