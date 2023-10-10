@@ -5,31 +5,34 @@
 // basically keep an "average" distance between the new line and the one below but vary it randomly in a range around that average
 // inspired by https://wallpapers.com/background/outrun-background-shc6gktszq7irin3.html
 
-int steps = 10;
-int startFromBottom = 20;
-float variance = 15;
+int segments = 15; // more segments, wavier line
+int separation = 40; // distance between lines
+float variance = 20; // variance applied to separation; less variance, more consistency in separation
+float totalDecay = 0.80; // decay applied to separation to have lines get closer together as they are drawn
+
+color lineColor = color(225,75,255);
+color glowColor = color(255);
+int glowBlur = 2;
 
 int startY;
 
 float vary(int mid, float range) {
   return random(mid-range, mid+range);
-  //return(mid + (randomGaussian() * range));
 }
 
 float vary(float mid, float range) {
   return random(mid-range, mid+range);
-  //return(mid + (randomGaussian() * range));
 }
 
 void setup() {
-  size(400, 400);
+  size(800, 800);
   noFill();
   smooth();
   background(0);
-  stroke(255);
+  stroke(glowColor);
   strokeWeight(2);
   
-  startY = height - startFromBottom;
+  startY = height - separation;
 }
 
 void jagged_line() {
@@ -41,30 +44,53 @@ void jagged_line() {
 }
 
 void one_vector_line() {
-  Contour c = new Contour(steps, variance);
+  Contour c = new Contour(segments, variance);
   
   c.display();
 }
 
 void many_vector_lines(int count) {
-  Contour firstLine = new Contour(steps, variance);
-  firstLine.display();
+  Contour[] contours = new Contour[count];
   
-  Contour prevLine = firstLine;
+
+  stroke(glowColor);
+  
+  contours[0] = new Contour(segments, variance);
+  contours[0].display();
+  
   for (int i = 1; i < count; i++) {
-    float newVariance = variance - (float(i)/5);
-    Contour newLine = new Contour(prevLine, startFromBottom, newVariance); 
-    newLine.display();
-    prevLine = newLine;
+    float decay = totalDecay / count;
+    contours[i] = new Contour(contours[i-1], separation * (1-(decay*i)), variance * (1-(decay*i))); 
+    contours[i].display();
   }
+  
+
+  filter( BLUR, glowBlur );
+  stroke(lineColor);
+  
+  for (int i = 0; i < count; i++) {
+    contours[i].display();
+  }
+  
+  stroke(0);
+  fill(255,239,0);
+  ellipse(width/2, 175, 250, 250);
+  noFill();
+  
+
 }
 
 void draw() {
   background(0);
  
   //jagged_line();
-  one_vector_line();
-  //many_vector_lines(10);
+  //one_vector_line();
+  many_vector_lines(20);
+  
+  // painting process
+    // set up contours
+    // set up sun
+
   
   delay(2000);
 }

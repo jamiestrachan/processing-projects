@@ -11,13 +11,17 @@ class Contour {
     points[pointCount-1] = new PVector (width, vary(height-variance, variance));
   }
   
-  Contour (Contour c, int separation, float variance) {
+  Contour (Contour c, float separation, float variance) {
     pointCount = c.getPointCount();
     points = new PVector[pointCount];
     for (int i = 0; i < pointCount; i++) {
-      points[i] = new PVector (c.pointNumber(i+1).x, vary(c.pointNumber(i+1).y - separation, variance));
+      points[i] = new PVector (c.pointNumber(i+1).x, vary(c.pointNumber(i+1).y - (separation   * sin(map(i,0,pointCount-1,PI/4,3*PI/4))  ), variance  ));
+      //println(map(i,0,pointCount-1,0,PI) + ", " + variance * sin(map(i,0,pointCount-1,0,PI)));
     }
+    //  String sep = "END";
+    //println("---");
   }
+
   
   PVector pointNumber(int i) {
     return points[i-1];
