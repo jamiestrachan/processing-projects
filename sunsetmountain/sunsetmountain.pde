@@ -8,13 +8,13 @@
 int segments = 15; // more segments, wavier line
 int separation = 40; // distance between lines
 float variance = 20; // variance applied to separation; less variance, more consistency in separation
-float totalDecay = 0.80; // decay applied to separation to have lines get closer together as they are drawn
+float totalDecay = 0.8; // decay applied to separation to have lines get closer together as they are drawn
 
 color lineColor = color(225,75,255);
 color glowColor = color(255);
-int glowBlur = 2;
+float glowBlur = 2;
 
-int startY;
+PGraphics mountain, sun;
 
 float vary(int mid, float range) {
   return random(mid-range, mid+range);
@@ -25,72 +25,61 @@ float vary(float mid, float range) {
 }
 
 void setup() {
+  // establish canvas
   size(800, 800);
-  noFill();
-  smooth();
   background(0);
-  stroke(glowColor);
-  strokeWeight(2);
   
-  startY = height - separation;
+  // set up the sun layer
+  sun = createGraphics(200, 200);
+  sun.smooth();
+  // we only draw the sun once so can do it here in setup()
+  drawSun(sun);
+  
+  // we'll redraw the mountain with each draw() so just set up the layer for now
+  mountain = createGraphics(width, height);
+  mountain.smooth();
 }
 
-void jagged_line() {
-  beginShape();
-  for (int x = 0; x <= width; x+=10) {
-    vertex(x, vary(startY, variance));
-  }
-  endShape();
+void drawSun(PGraphics pg) { // draw the sun to the layer
+  pg.beginDraw();
+  
+  pg.stroke(0);
+  pg.fill(255,239,0);
+  pg.ellipse(pg.width * 0.5, pg.height * 0.5, pg.width, pg.height);
+  
+  pg.endDraw();
 }
 
-void one_vector_line() {
-  Contour c = new Contour(segments, variance);
+void drawMountain(PGraphics pg, ContourMap cm) { // draw the mountain to the layer
+  pg.beginDraw();
   
-  c.display();
+  pg.background(0, 0); // need to clear the canvas but still want it to be transparent. Apparently black with 0 alpha works??
+  pg.noFill();
+  pg.strokeWeight(2);
+  
+  // first pass is for glow effect
+  pg.stroke(glowColor);
+  cm.display(pg);
+  pg.filter(BLUR, glowBlur);
+  pg.filter(DILATE);
+  pg.filter(DILATE);
+  
+  // second pass is for solid lines
+  pg.stroke(lineColor);
+  cm.display(pg);
+  
+  pg.endDraw();
 }
 
-void many_vector_lines(int count) {
-  Contour[] contours = new Contour[count];
+void draw() { // each draw() resets the canvas, generates a new ContourMap, draws it, then places the sun and mountain layers
   
-
-  stroke(glowColor);
-  
-  contours[0] = new Contour(segments, variance);
-  contours[0].display();
-  
-  for (int i = 1; i < count; i++) {
-    float decay = totalDecay / count;
-    contours[i] = new Contour(contours[i-1], separation * (1-(decay*i)), variance * (1-(decay*i))); 
-    contours[i].display();
-  }
-  
-
-  filter( BLUR, glowBlur );
-  stroke(lineColor);
-  
-  for (int i = 0; i < count; i++) {
-    contours[i].display();
-  }
-  
-  stroke(0);
-  fill(255,239,0);
-  ellipse(width/2, 175, 250, 250);
-  noFill();
-  
-
-}
-
-void draw() {
   background(0);
- 
-  //jagged_line();
-  //one_vector_line();
-  many_vector_lines(20);
-  
-  // painting process
-    // set up contours
-    // set up sun
+   
+  ContourMap cm = new ContourMap(20, segments, separation, variance, totalDecay);
+  drawMountain(mountain, cm);
 
+  image(sun, (width * 0.5) - (sun.width * 0.5), 75);
+  image(mountain, 0, 0);
   
   delay(2000);
 }

@@ -15,13 +15,9 @@ class Contour {
     pointCount = c.getPointCount();
     points = new PVector[pointCount];
     for (int i = 0; i < pointCount; i++) {
-      points[i] = new PVector (c.pointNumber(i+1).x, vary(c.pointNumber(i+1).y - (separation   * sin(map(i,0,pointCount-1,PI/4,3*PI/4))  ), variance  ));
-      //println(map(i,0,pointCount-1,0,PI) + ", " + variance * sin(map(i,0,pointCount-1,0,PI)));
+      points[i] = new PVector (c.pointNumber(i+1).x, vary(c.pointNumber(i+1).y - (separation * sin(map(i,0,pointCount-1,QUARTER_PI,3*QUARTER_PI)) ), variance  ));
     }
-    //  String sep = "END";
-    //println("---");
   }
-
   
   PVector pointNumber(int i) {
     return points[i-1];
@@ -50,6 +46,31 @@ class Contour {
     curveVertex(points[pointCount-1].x, points[pointCount-1].y);
     curveVertex(points[pointCount-1].x, points[pointCount-1].y);
     endShape();
+  }
+  
+  void display(PGraphics pg) {
+    pg.beginShape();
+    pg.curveVertex(points[0].x, points[0].y);
+    pg.curveVertex(points[0].x, points[0].y);
+    pg.curveVertex(points[1].x, points[1].y);
+    pg.curveVertex(points[2].x, points[2].y);
+    pg.endShape();
+      
+    for (int i = 0; i < pointCount - 3; i++) {
+      pg.beginShape();
+      pg.curveVertex(points[i].x, points[i].y);
+      pg.curveVertex(points[i + 1].x, points[i + 1].y);
+      pg.curveVertex(points[i + 2].x, points[i + 2].y);
+      pg.curveVertex(points[i + 3].x, points[i + 3].y);
+      pg.endShape();
+    }
+  
+    pg.beginShape();
+    pg.curveVertex(points[pointCount-3].x, points[pointCount-3].y);
+    pg.curveVertex(points[pointCount-2].x, points[pointCount-2].y);
+    pg.curveVertex(points[pointCount-1].x, points[pointCount-1].y);
+    pg.curveVertex(points[pointCount-1].x, points[pointCount-1].y);
+    pg.endShape();
   }
   
   int getPointCount() {
